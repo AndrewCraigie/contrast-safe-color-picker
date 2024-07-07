@@ -8,13 +8,35 @@ import { colorHexValue } from './colour.types';
 
 import './ContrastSafeColourPicker.scss';
 
-export type onChangeColor= (color: colorHexValue) => void;
+export type onChangeColor = (color: colorHexValue) => void;
 
 export type ContrastSafeColourPickerProps = {
     color: colorHexValue;
     onChangeColor: onChangeColor;
 };
 
+// function to read the pixel data of the canvas from values in the range of 0 to 1
+// the pixel data is read at the pixelX and pixelY values. 
+// function is called when the user clicks the canvas and when the hue and lightness values are changed
+const readColorFromCanvas = (glc: WebGLRenderingContext, normalisedX: number, normalisedY: number): colorHexValue => {
+
+    let newColor: colorHexValue = '#000000';
+
+    if (glc) {
+        const pixelX = normalisedX * glc.canvas.width;
+        const pixelY = (1 - normalisedY) * glc.canvas.height; // invert the lightness value to match the canvas coordinate system
+
+        const data = new Uint8Array(4);
+        glc.readPixels(pixelX, pixelY, 1, 1, glc.RGBA, glc.UNSIGNED_BYTE, data);
+
+        const [r, g, b] = data;
+        // convert the rgb data to a hex color
+        newColor = rgbToHex({ r, g, b });
+
+    }
+    return newColor
+
+}
 
 
 // React component that presents a colour picker that ensures the chosen colour has a contrast ratio of at least 4.5:1 with white text.
@@ -60,47 +82,65 @@ const ContrastSafeColourPicker: React.FC<ContrastSafeColourPickerProps> = (
 
 
     const onSaturationChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
-        const saturationValue = parseFloat(event.target.value);
-        const newColor = readColorFromCanvas(hue, 1 - lightness); // invert the lightness value to match the canvas coordinate system
-        setSaturation(saturationValue);
-    };
 
-    const onHueChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
-        const hueValue = parseFloat(event.target.value);
-        const newColor = readColorFromCanvas(hueValue, 1 - lightness); // invert the lightness value to match the canvas coordinate system
-        setHue(hueValue);
-    };
-
-    const onLightnessChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
-        const lightnessValue = parseFloat(event.target.value);
-        const newColor = readColorFromCanvas(hue, 1 - lightnessValue); // invert the lightness value to match the canvas coordinate system  
-        setLightness(lightnessValue);
-    };
-
-    // function to read the pixel data of the canvas from values in the range of 0 to 1
-    // the pixel data is read at the pixelX and pixelY values. 
-    // function is called when the user clicks the canvas and when the hue and lightness values are changed
-    const readColorFromCanvas = (normalisedX: number, normalisedY: number): colorHexValue => {
 
         const glc: WebGLRenderingContext | null = gl.current;
 
-        let newColor: colorHexValue = '#000000';
-
         if (glc) {
-            const pixelX = normalisedX * glc.canvas.width;
-            const pixelY = (1 - normalisedY) * glc.canvas.height; // invert the lightness value to match the canvas coordinate system
-
-            const data = new Uint8Array(4);
-            glc.readPixels(pixelX, pixelY, 1, 1, glc.RGBA, glc.UNSIGNED_BYTE, data);
-
-            const [r, g, b] = data;
-            // convert the rgb data to a hex color
-            newColor = rgbToHex({ r, g, b });
-
+            const saturationValue = parseFloat(event.target.value);
+            const newColor = readColorFromCanvas(glc, hue, 1 - lightness); // invert the lightness value to match the canvas coordinate system
+            setSaturation(saturationValue);
         }
-        return newColor
 
-    }
+
+    };
+
+    const onHueChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
+
+
+        const glc: WebGLRenderingContext | null = gl.current;
+        if (glc) {
+            const hueValue = parseFloat(event.target.value);
+            const newColor = readColorFromCanvas(glc, hueValue, 1 - lightness); // invert the lightness value to match the canvas coordinate system
+            setHue(hueValue);
+        }
+
+
+    };
+
+    const onLightnessChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
+
+        const glc: WebGLRenderingContext | null = gl.current;
+        if (glc) {
+            const lightnessValue = parseFloat(event.target.value);
+            const newColor = readColorFromCanvas(glc, hue, 1 - lightnessValue); // invert the lightness value to match the canvas coordinate system  
+            setLightness(lightnessValue);
+        }
+
+    };
+
+    // // function to read the pixel data of the canvas from values in the range of 0 to 1
+    // // the pixel data is read at the pixelX and pixelY values. 
+    // // function is called when the user clicks the canvas and when the hue and lightness values are changed
+    // const readColorFromCanvas = (glc: WebGLRenderingContext, normalisedX: number, normalisedY: number): colorHexValue => {
+
+    //     let newColor: colorHexValue = '#000000';
+
+    //     if (glc) {
+    //         const pixelX = normalisedX * glc.canvas.width;
+    //         const pixelY = (1 - normalisedY) * glc.canvas.height; // invert the lightness value to match the canvas coordinate system
+
+    //         const data = new Uint8Array(4);
+    //         glc.readPixels(pixelX, pixelY, 1, 1, glc.RGBA, glc.UNSIGNED_BYTE, data);
+
+    //         const [r, g, b] = data;
+    //         // convert the rgb data to a hex color
+    //         newColor = rgbToHex({ r, g, b });
+
+    //     }
+    //     return newColor
+
+    // }
 
     const onClickCanvas: React.MouseEventHandler<HTMLCanvasElement> = (event) => {
 
@@ -124,7 +164,7 @@ const ContrastSafeColourPicker: React.FC<ContrastSafeColourPickerProps> = (
 
             console.log('normalisedHueValue', normalisedHueValue, 'normalisedLightnessValue', normalisedLightnessValue);
 
-            const newColor = readColorFromCanvas(normalisedHueValue, normalisedLightnessValue);
+            const newColor = readColorFromCanvas(glc, normalisedHueValue, normalisedLightnessValue);
             setPickedColor(newColor);
 
             // set the hue and lightness values based on the positionX and positionY values
@@ -250,11 +290,17 @@ const ContrastSafeColourPicker: React.FC<ContrastSafeColourPickerProps> = (
     }, [saturation])
 
     useEffect(() => {
-        // Calculate the new color based on the current hue, lightness, and saturation values.
-        // This assumes that readColorFromCanvas has been updated to work with the current state values directly,
-        // or you adjust the call accordingly.
-        const newColor = readColorFromCanvas(hue, 1 - lightness); // Note: Adjust as necessary for your use case
-        setPickedColor(newColor);
+
+        const glc = gl.current;
+
+        if (glc) {
+            // Calculate the new color based on the current hue, lightness, and saturation values.
+            // This assumes that readColorFromCanvas has been updated to work with the current state values directly,
+            // or you adjust the call accordingly.
+            const newColor = readColorFromCanvas(glc, hue, 1 - lightness); // Note: Adjust as necessary for your use case
+            setPickedColor(newColor);
+        }
+
     }, [hue, lightness, saturation]); // Dependencies: Recalculate when these values change
 
     useEffect((): void => {
@@ -265,12 +311,12 @@ const ContrastSafeColourPicker: React.FC<ContrastSafeColourPickerProps> = (
         setSaturation(hslColor.s);
         setHue(hslColor.h);
         setLightness(hslColor.l);
-    },[]);
+    }, []);
 
-        // function to call onChangeColor when the pickedColor changes
-        useEffect((): void => {
-            onChangeColor(pickedColor);
-        }, [pickedColor]);
+    // function to call onChangeColor when the pickedColor changes
+    useEffect((): void => {
+        onChangeColor(pickedColor);
+    }, [pickedColor]);
 
 
     // calculate the position of the pointer on the canvas based on the hue and lightness values
