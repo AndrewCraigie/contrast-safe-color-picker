@@ -23,6 +23,39 @@ export interface GraphicsState {
     saturation: number;
 }
 
+// Requirements of component and suggested tests:
+// The component should display sliders for selecting the saturation, hue, and lightness of a color.
+// The component should update the selected color based on the values of the sliders.
+// The component should render a canvas where the user can click to select a color.
+// The component should update the selected color based on the clicked position on the canvas.
+// The component should display the selected color in an input field.
+// The component should call the onChangeColor callback when the selected color changes.
+// Based on these requirements, here are some possible tests that could be written to cover them:
+
+// Test that the sliders are rendered correctly and that changing their values updates the selected color.
+// Test that clicking on the canvas updates the selected color based on the clicked position.
+// Test that the selected color is displayed correctly in the input field.
+// Test that the onChangeColor callback is called when the selected color changes.
+// Test that the component initializes with the correct initial color based on the color prop.
+// Test that the component updates the selected color when the color prop changes.
+// These tests should cover the basic functionality of the ContrastSafeColourPicker component and ensure that it behaves as expected.Based on the code provided, it appears that the ContrastSafeColourPicker component is responsible for rendering a color picker interface. Here are some possible requirements/acceptance criteria for this component:
+
+// The component should display sliders for selecting the saturation, hue, and lightness of a color.
+// The component should update the selected color based on the values of the sliders.
+// The component should render a canvas where the user can click to select a color.
+// The component should update the selected color based on the clicked position on the canvas.
+// The component should display the selected color in an input field.
+// The component should call the onChangeColor callback when the selected color changes.
+// Based on these requirements, here are some possible tests that could be written to cover them:
+
+// Test that the sliders are rendered correctly and that changing their values updates the selected color.
+// Test that clicking on the canvas updates the selected color based on the clicked position.
+// Test that the selected color is displayed correctly in the input field.
+// Test that the onChangeColor callback is called when the selected color changes.
+// Test that the component initializes with the correct initial color based on the color prop.
+// Test that the component updates the selected color when the color prop changes.
+// These tests should cover the basic functionality of the ContrastSafeColourPicker component and ensure that it behaves as expected.
+
 const ContrastSafeColourPicker: React.FC<ContrastSafeColourPickerProps> = (
     props: ContrastSafeColourPickerProps
 ): React.ReactElement => {
