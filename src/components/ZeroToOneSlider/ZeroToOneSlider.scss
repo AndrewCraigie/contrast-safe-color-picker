@@ -1,0 +1,29 @@
+.zero-to-one-slider {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: start;
+    width: 100%;
+    margin: 0;
+    margin-top: 5px;
+    margin-left: -12px;
+    border: none;
+    font-size: 14px;
+}
+
+.zero-to-one-slider-input {
+    background-color: red;
+    width: 100% !important;
+}
+
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+  }
+  
